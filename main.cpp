@@ -29,13 +29,13 @@
 
 int main(int argc, char **argv)
 {
-	WordSeg model("count_1w.txt");
-	WSUnigram bar;
-	vector<WSUnigram> ex;
+	WordSeg model("count_1w.txt", "count_2w.txt");
+	WSGram bar;
+	vector<WSGram> ex;
 	string test;
 
 	
-	test = model.str_upper("tobeornottobe");
+	test = model.StringUpper("tobeornottobe");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.str_upper("wheninthecourse");
+	test = model.StringUpper("wheninthecourse");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.str_upper("wheninthecourseof");
+	test = model.StringUpper("wheninthecourseof");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
@@ -65,8 +65,8 @@ int main(int argc, char **argv)
 	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.str_upper("wheninthecourseofhumanevents");
-	ex = model.Segment(model.str_upper(test));
+	test = model.StringUpper("wheninthecourseofhumanevents");
+	ex = model.Segment(model.StringUpper(test));
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
@@ -74,18 +74,8 @@ int main(int argc, char **argv)
 	cout << endl << endl;
 	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
-	test = model.str_upper("essciftfooaanacfnowwswdp");
-	ex = model.Segment(model.str_upper(test));
-	
-	for(int i = 0; i < (int)ex.size(); i++) {
-		cout << ex[i].gram << " ";
-	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
-	
-	
-	test = model.str_upper("inaholeinthegroundtherelivedahobbitnotanastydirtywetholefilledwiththeendsofwormsandanoozysmellnoryetadrybaresandyholewithnothinginittositdownonortoeatitwasahobbitholeandthatmeanscomfort");
-	ex = model.Segment(model.str_upper(test));
+	test = model.StringUpper("essciftfooaanacfnowwswdp");
+	ex = model.Segment(model.StringUpper(test));
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
@@ -94,8 +84,8 @@ int main(int argc, char **argv)
 	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.str_upper("MostlockingroutinessuchaspthreadssemaphoresandsysvsemaphoresworkonthatsortoflogicalthoughthespecificAPIcallsaredifferent");
-	ex = model.Segment(model.str_upper(test));
+	test = model.StringUpper("inaholeinthegroundtherelivedahobbitnotanastydirtywetholefilledwiththeendsofwormsandanoozysmellnoryetadrybaresandyholewithnothinginittositdownonortoeatitwasahobbitholeandthatmeanscomfort");
+	ex = model.Segment(model.StringUpper(test));
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
@@ -104,7 +94,17 @@ int main(int argc, char **argv)
 	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.str_upper("ThethousandinjuriesofFortunatoIhadborneasIbestcouldbutwhenheventureduponinsultIvowedrevengeYouwhosowellknowthenatureofmysoulwillnotsupposehoweverthatIgaveutterancetoathreat");
+	test = model.StringUpper("MostlockingroutinessuchaspthreadssemaphoresandsysvsemaphoresworkonthatsortoflogicalthoughthespecificAPIcallsaredifferent");
+	ex = model.Segment(model.StringUpper(test));
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << endl;
+	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	test = model.StringUpper("ThethousandinjuriesofFortunatoIhadborneasIbestcouldbutwhenheventureduponinsultIvowedrevengeYouwhosowellknowthenatureofmysoulwillnotsupposehoweverthatIgaveutterancetoathreat");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
