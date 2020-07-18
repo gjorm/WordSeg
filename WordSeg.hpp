@@ -186,7 +186,7 @@ private:
 					result.clear();
 					cands.clear();
 					
-					//this is commented out for now, but used for troubleshooting
+					//count the number of iterations it takes to compute an input
 					numIters++;
 				}
 			}
@@ -331,7 +331,7 @@ public:
 
 		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
 		//segMemo will maintain return values that benefit other runs of Segment, even with different input
-		//segMemo.clear();
+		segMemo.clear();
 		numIters = 0;
 		
 		return result;
