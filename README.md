@@ -3,7 +3,7 @@ English language word segmentation on strings with no spaces in a Header Only Li
 
 Based on Chapter 14 of Beautiful Data and using the word unigram frequencies from Peter Norvig: https://norvig.com/ngrams/
 
-This is essentially a C++ port of his segment() function. Both the system() calls to Python one-liners and Pythons C API were too slow to be useful.
+This is essentially a C++ port of his segment() function. Both the system() calls to Python one-liners and Pythons C API calls to WordSegment.segment() were too slow to be useful, when used in an inner loop testing several iterations.
 
 This uses his unigram model and memoized recursive function design. I implemented simple but effective memoization via an unordered_map.
 
