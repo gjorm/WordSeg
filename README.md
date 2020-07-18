@@ -9,7 +9,7 @@ This uses his unigram model and memoized recursive function design. I implemente
 
 Included is support for BiGrams, so you can score a vector of grams with the BiGram data, however Segment() still uses unigrams in its scoring method.
 
-Included is a simple test program (main.cpp) and count_1w.txt which contains the English letter counts distilled from the Google Web Trillion Word Corpus.
+Included is a simple test program (main.cpp), count_1w.txt, and count_2w.txt which contains the English word uni/biGram counts distilled from the Google Web Trillion Word Corpus.
 
 Special Note:
-  >>> You must supply WordSeg with strings entirely in upper case for it to work.
+  <b>You must supply WordSeg with strings entirely in upper case for it to work.</b>
