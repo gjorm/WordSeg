@@ -7,4 +7,9 @@ This is essentially a C++ port of his segment() function. Both the system() call
 
 This uses his unigram model and memoized recursive function design. I implemented simple but effective memoization via an unordered_map.
 
+Included is support for BiGrams, so you can score a vector of grams with the BiGram data, however Segment() still uses unigrams in its scoring method.
+
 Included is a simple test program (main.cpp) and count_1w.txt which contains the English letter counts distilled from the Google Web Trillion Word Corpus.
+
+Special Note:
+  >>> You must supply WordSeg with strings entirely in upper case for it to work.
