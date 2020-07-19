@@ -33,85 +33,133 @@ int main(int argc, char **argv)
 	WSGram bar;
 	vector<WSGram> ex;
 	string test;
+	double gramCount = 0;
+	
+	gramCount += model.GetGramScore("OOZY");
+	cout << "Single Gram Proba Test for OOZY:  " << gramCount << endl;
+	gramCount += model.GetGramScore("SMELL");
+	cout << "Single Gram Proba Test for SMELL:  " << model.GetGramScore("SMELL") << endl;
+	gramCount += model.GetGramScore("NOR");
+	cout << "Single Gram Proba Test for NOR:  " << model.GetGramScore("NOR") << endl;
+	gramCount += model.GetGramScore("YET");
+	cout << "Single Gram Proba Test for YET: " << model.GetGramScore("YET") << endl;
+	gramCount += model.GetGramScore("A");
+	cout << "Single Gram Proba Test for A:  " << model.GetGramScore("A") << endl;
+	gramCount += model.GetGramScore("DRY");
+	cout << "Single Gram Proba Test for DRY:  " << model.GetGramScore("DRY") << endl;
+	gramCount += model.GetGramScore("BARE");
+	cout << "Single Gram Proba Test for BARE:  " << model.GetGramScore("BARE") << endl;
+	cout << "Total: " << gramCount << endl << endl;
+	
+	cout << "Single Gram Proba Test for IIOASAINTTICFTDOCTSATN: " << model.GetGramScore("IIOASAINTTICFTDOCTSATN") << endl << endl;
 
 	
-	test = model.StringUpper("tobeornottobe");
+	test = "IIOASAINTTICFTDOCTSATN";
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
 	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.StringUpper("wheninthecourse");
+	test = WordSeg::StringUpper("wheninthecourse");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
 	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	//model.PrintSegMemo();
+	//cout << endl;
 	
 	
-	test = model.StringUpper("wheninthecourseof");
+	test = WordSeg::StringUpper("AFTERanunequivocalexperienceoftheinefficacyofthesubsistingfederalgovernmentyouarecalledupontodeliberateonanewConstitutionfortheUnitedStatesofAmericaThesubjectspeaksitsownimportancecomprehendinginitsconsequencesnothinglessthantheexistenceoftheUNIONthesafetyandwelfareofthepartsofwhichitiscomposedthefateofanempireinmanyrespectsthemostinterestingintheworldIthasbeenfrequentlyremarkedthatitseemstohavebeenreservedtothepeopleofthiscountrybytheirconductandexampletodecidetheimportantquestionwhethersocietiesofmenarereallycapableornotofestablishinggoodgovernmentfromreflectionandchoiceorwhethertheyareforeverdestinedtodependfortheirpoliticalconstitutionsonaccidentandforceIftherebeanytruthintheremarkthecrisisatwhichwearearrivedmaywithproprietyberegardedastheerainwhichthatdecisionistobemadeandawrongelectionofthepartweshallactmayinthisviewdeservetobeconsideredasthegeneralmisfortuneofmankind");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
 	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	test = model.StringUpper("wheninthecourseofhumanevents");
-	ex = model.Segment(model.StringUpper(test));
-	
-	for(int i = 0; i < (int)ex.size(); i++) {
-		cout << ex[i].gram << " ";
-	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
-	
-	test = model.StringUpper("essciftfooaanacfnowwswdp");
-	ex = model.Segment(model.StringUpper(test));
-	
-	for(int i = 0; i < (int)ex.size(); i++) {
-		cout << ex[i].gram << " ";
-	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
-	
-	
-	test = model.StringUpper("inaholeinthegroundtherelivedahobbitnotanastydirtywetholefilledwiththeendsofwormsandanoozysmellnoryetadrybaresandyholewithnothinginittositdownonortoeatitwasahobbitholeandthatmeanscomfort");
-	ex = model.Segment(model.StringUpper(test));
-	
-	for(int i = 0; i < (int)ex.size(); i++) {
-		cout << ex[i].gram << " ";
-	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
-	
-	
-	test = model.StringUpper("MostlockingroutinessuchaspthreadssemaphoresandsysvsemaphoresworkonthatsortoflogicalthoughthespecificAPIcallsaredifferent");
-	ex = model.Segment(model.StringUpper(test));
-	
-	for(int i = 0; i < (int)ex.size(); i++) {
-		cout << ex[i].gram << " ";
-	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
-	
-	
-	test = model.StringUpper("ThethousandinjuriesofFortunatoIhadborneasIbestcouldbutwhenheventureduponinsultIvowedrevengeYouwhosowellknowthenatureofmysoulwillnotsupposehoweverthatIgaveutterancetoathreat");
+	test = WordSeg::StringUpper("wheninthecourseofhumanevents");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
 	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	test = "OOZYSMELLNORYETADRYBARE";
+	ex = model.Segment(test);
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	test = WordSeg::StringUpper("inaholeinthegroundtherelivedahobbitnotanastydirtywetholefilledwiththeendsofwormsandanoozysmellnoryetadrybaresandyholewithnothinginittositdownonortoeatitwasahobbitholeandthatmeanscomfort");
+	ex = model.Segment(test);
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	test = WordSeg::StringUpper("MostlockingroutinessuchaspthreadssemaphoresandsysvsemaphoresworkonthatsortoflogicalthoughthespecificAPIcallsaredifferent");
+	ex = model.Segment(test);
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	test = WordSeg::StringUpper("ThethousandinjuriesofFortunatoIhadborneasIbestcouldbutwhenheventureduponinsultIvowedrevengeYouwhosowellknowthenatureofmysoulwillnotsupposehoweverthatIgaveutterancetoathreat");
+	ex = model.Segment(test);
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	//the following two examples have inputs with identical words, but in reverse order
+	pair<double, string> exPair;
+	test = WordSeg::StringUpper("backwardsissentencethis");
+	ex = model.Segment(test);
+	exPair = model.GetVecPair(ex);
+	
+	cout << exPair.second << endl;
+	
+	cout << "  uniGrams Score: " << exPair.first << endl;
+	
+	test = WordSeg::StringUpper("thissentenceisbackwards");
+	ex = model.Segment(test);
+	exPair = model.GetVecPair(ex);
+	
+	cout << exPair.second << endl;
+	
+	cout << "  uniGrams Score: " << exPair.first << endl;
+	
+	double biScore = model.GetVecBiGramScore(ex);
+	
+	cout << "  biGrams Score: " << biScore << endl << endl;
+	
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
 	
 	time_t before;
 	time(&before);
@@ -122,8 +170,8 @@ int main(int argc, char **argv)
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
 	}
-	cout << endl << endl;
-	//cout << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	time_t after;
 	time(&after);
