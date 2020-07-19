@@ -7,7 +7,7 @@ This is essentially a C++ port of his WordSegment module (https://pypi.org/proje
 
 This uses his unigram model and memoized recursive function design. I implemented simple but effective memoization via an unordered_map.
 
-Included is support for BiGrams, so you can score a vector of grams with the BiGram data, however Segment() still uses unigrams in its scoring method as my implementation of BiGrams isn't very good. I've attempted an approach like Norvigs but my knowledge of python is pretty poor.
+Included is support for BiGrams, so you can score a vector of grams with the BiGram data, however Segment() still uses unigrams in its scoring method as my implementation of BiGrams isn't very good. I've attempted an approach like Norvigs but the UniGram scoring has been tweaked so much its hard to improve.
 
 Included is a simple test program (main.cpp), count_1w.txt, and count_2w.txt which contains the English word uni/biGram counts distilled from the Google Web Trillion Word Corpus.
 
