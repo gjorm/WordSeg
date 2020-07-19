@@ -81,8 +81,25 @@ public:
 	}
 };
 
+//overload for comparing two grams
 bool operator < (const WSGram &lhs, const WSGram &rhs) {
 	return lhs.score < rhs.score;
+}
+
+//operator overload for the priority queue of a vector of grams
+bool operator < (const vector<WSGram> &lhs, const vector<WSGram> &rhs) {
+	double lScore = 0;
+	double rScore = 0;
+	
+	for(int i = 0; i < (int)lhs.size(); i++) {
+		lScore += lhs[i].score;
+	}
+	
+	for(int i = 0; i < (int)rhs.size(); i++) {
+		rScore += rhs[i].score;
+	}
+	
+	return lScore < rScore;
 }
 
 
@@ -169,6 +186,8 @@ private:
 					
 					//Score
 					//only need to score the left gram; the lower recursive depths will return this and higher depths will accept as the higher prob segment of right
+					//I attempted to improve this by keeping track of the score of the entire vector, however it still involved calculating the score twice per
+					//bucket
 					wsLeft.score = GetGramScore(wsLeft.gram);
 					
 					//store into result (result is being used as a worker, not a return val yet)
@@ -307,21 +326,8 @@ public:
 		}
 		inFile.close();
 		
-		//cout << "gMin: " << gMin << " gMax: " << gMax << endl << endl;
 		
-		/*
-		WSGram foo;
-		ofstream outFile("parsedUniGrams.txt");
-		if(outFile.is_open()) {
-			for(gi = uniGrams.begin(); gi != uniGrams.end(); ++gi) {
-				foo = gi->second;
-				outFile << foo.gram << " " << foo.score << endl;
-			}
-		}
-		outFile.close();
-		*/
-		
-		//Set a large bucket size for the Memo Hash Table
+		//Set a arbitarily large bucket size for the Memo Hash Table
 		segMemo.rehash(segMemoSize);
 
 	}
@@ -528,21 +534,5 @@ public:
 		return segMemo.size();
 	}
 };
-
-//operator overload for the priority queue of a vector of grams
-bool operator < (const vector<WSGram> &lhs, const vector<WSGram> &rhs) {
-	double lScore = 0;
-	double rScore = 0;
-	
-	for(int i = 0; i < (int)lhs.size(); i++) {
-		lScore += lhs[i].score;
-	}
-	
-	for(int i = 0; i < (int)rhs.size(); i++) {
-		rScore += rhs[i].score;
-	}
-	
-	return lScore < rScore;
-}
 
 #endif
