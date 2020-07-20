@@ -481,7 +481,7 @@ public:
 			gi = biGrams.find(test);
 			
 			if (gi != uniGrams.end()) {
-				result = log10(gi->second.GetScore() / numCounts) / GetGramScore(left);
+				result = log10(gi->second.GetScore() / numCounts) / (GetGramScore(left) * 5);
 			}
 			else {
 				//on failure to find anything in the bigrams, fall back to unigrams for the right string
@@ -496,13 +496,17 @@ public:
 	double GetVecBiGramScore(vector<WSGram> &vec) {
 		double result;
 		
-		vec[0].score = GetGramScore(vec[0].gram);
+		result = 0.0;
 		
-		result = vec[0].score;
-		
-		for(int i = 1; i < (int)vec.size(); i++) {
-			vec[i].score = GetBiGramScore(vec[i - 1].gram, vec[i].gram);
-			result += vec[i].score;
+		if(vec.size() > 0) {
+			vec[0].score = GetGramScore(vec[0].gram);
+			
+			result = vec[0].score;
+			
+			for(int i = 1; i < (int)vec.size(); i++) {
+				vec[i].score = GetBiGramScore(vec[i - 1].gram, vec[i].gram);
+				result += vec[i].score;
+			}
 		}
 		
 		return result;
