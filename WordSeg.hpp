@@ -86,22 +86,6 @@ bool operator < (const WSGram &lhs, const WSGram &rhs) {
 	return lhs.score < rhs.score;
 }
 
-//operator overload for the priority queue of a vector of grams
-bool operator < (const vector<WSGram> &lhs, const vector<WSGram> &rhs) {
-	double lScore = 0;
-	double rScore = 0;
-	
-	for(int i = 0; i < (int)lhs.size(); i++) {
-		lScore += lhs[i].score;
-	}
-	
-	for(int i = 0; i < (int)rhs.size(); i++) {
-		rScore += rhs[i].score;
-	}
-	
-	return lScore < rScore;
-}
-
 
 
 class WordSeg
@@ -160,7 +144,7 @@ private:
 		WSGram wsLeft, wsRight;
 		vector<WSGram> cands;
 		vector<WSGram> result;
-		priority_queue<vector<WSGram>> candHeap;
+		vector<vector<WSGram>> candHeap;
 		unordered_map<string, vector<WSGram>>::iterator mi;
 		
 		if(in == "") {
@@ -179,23 +163,21 @@ private:
 					wsLeft.gram = in.substr(0, i);
 					wsRight.gram = in.substr(i, string::npos);
 					
-					if(wsLeft.gram == "") break;
-					
 					//recursively call pSegment on the right string
 					if(wsRight.gram != "") cands = pSegment(wsRight.gram);
 					
 					//Score
 					//only need to score the left gram; the lower recursive depths will return this and higher depths will accept as the higher prob segment of right
-					//I attempted to improve this by keeping track of the score of the entire vector, however it still involved calculating the score twice per
-					//bucket
+					//I attempted to improve this by keeping track of the score of the entire vector, however copying vectors around and extra inserts resulted in
+					//speed penalty
 					wsLeft.score = GetGramScore(wsLeft.gram);
 					
 					//store into result (result is being used as a worker, not a return val yet)
 					result.push_back(wsLeft);
 					if(cands.size() > 0) result.insert(result.end(), cands.begin(), cands.end());
 					
-					//push onto the priority queue
-					if(!result.empty()) candHeap.push(result);
+					//push onto the candHeap vector...
+					if(!result.empty()) candHeap.push_back(result);
 					
 					//clear out these vectors for next iteration
 					result.clear();
@@ -205,8 +187,22 @@ private:
 					numIters++;
 				}
 				
-				//grab the highest valued WSGram attempt from the priority_queue
-				result = candHeap.top();
+				//grab the highest valued WSGram attempt from the candHeap vector
+				//Iterating through the vector is a touch faster than a priority_queue because the operator overload of < requires two calls to GetVecGramScore() for each compare made when building the heap;
+				//Whereas I can call GetVecGramScore() once initially, then once for each vector in candHeap
+				result = candHeap[0];
+				double s, t;
+				
+				s = GetVecGramScore(result);
+				for(int i = 1; i < (int)candHeap.size(); i++) {
+					t = GetVecGramScore(candHeap[i]);
+					
+					if(t > s) {
+						result = candHeap[i];
+						s = t;
+					}
+				}
+				
 				
 				//insert the vector into the segMemo hash table, as it was not found at the beginning of the method
 				segMemo.insert(make_pair(in, result));
@@ -385,7 +381,7 @@ public:
 		double score;
 		
 		if(in.size() <= 0 || in == "") {
-			result = 0;
+			result = GetEmptyGramScore();
 		}
 		else {
 			gi = uniGrams.find(in);
@@ -403,18 +399,18 @@ public:
 		return result;
 	}
 	
-	//calculate a vector of grams' scores
-	double GetVecGramScore(vector<WSGram> &vG) {
-		double total = 0.0;
+	static double GetEmptyGramScore() {
+		return 0;
+	}
+	
+	//calculate a vector of grams' scores. The input vector is assumed to have been segmented and each Gram contains its pre calculated score from Segment()
+	static double GetVecGramScore(const vector<WSGram> &vG) {
+		double total = GetEmptyGramScore();
 		
 		if(vG.size() > 0) {
 			for(int i = 0; i < (int)vG.size(); i++) {
-				vG[i].score = GetGramScore(vG[i].gram);
 				total += vG[i].score;
 			}
-		}
-		else {
-			total = GetGramScore("");
 		}
 		
 		return total;
@@ -481,7 +477,7 @@ public:
 			gi = biGrams.find(test);
 			
 			if (gi != uniGrams.end()) {
-				result = log10(gi->second.GetScore() / numCounts) / (GetGramScore(left) * 5);
+				result = log10((gi->second.GetScore() * test.size()) / numCounts) / (GetGramScore(left) * 5);
 			}
 			else {
 				//on failure to find anything in the bigrams, fall back to unigrams for the right string
@@ -538,5 +534,16 @@ public:
 		return segMemo.size();
 	}
 };
+
+//operator overload for the priority queue of a vector of grams
+bool operator < (const vector<WSGram> &lhs, const vector<WSGram> &rhs) {
+	double lScore = 0;
+	double rScore = 0;
+	
+	lScore = WordSeg::GetVecGramScore(lhs);
+	rScore = WordSeg::GetVecGramScore(rhs);
+	
+	return lScore < rScore;
+}
 
 #endif
