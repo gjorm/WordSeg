@@ -168,8 +168,7 @@ private:
 					
 					//Score
 					//only need to score the left gram; the lower recursive depths will return this and higher depths will accept as the higher prob segment of right
-					//I attempted to improve this by keeping track of the score of the entire vector, however copying vectors around and extra inserts resulted in
-					//speed penalty
+					//I attempted to improve this by keeping track of the score of the entire vector, ensuring a single calculation, however this still resulted in innefficiency
 					wsLeft.score = GetGramScore(wsLeft.gram);
 					
 					//store into result (result is being used as a worker, not a return val yet)
@@ -188,8 +187,7 @@ private:
 				}
 				
 				//grab the highest valued WSGram attempt from the candHeap vector
-				//Iterating through the vector is a touch faster than a priority_queue because the operator overload of < requires two calls to GetVecGramScore() for each compare made when building the heap;
-				//Whereas I can call GetVecGramScore() once initially, then once for each vector in candHeap
+				//Iterating through the vector afterwards is a touch faster than a priority_queue during the above for loop
 				result = candHeap[0];
 				double s, t;
 				
@@ -537,13 +535,7 @@ public:
 
 //operator overload for the priority queue of a vector of grams
 bool operator < (const vector<WSGram> &lhs, const vector<WSGram> &rhs) {
-	double lScore = 0;
-	double rScore = 0;
-	
-	lScore = WordSeg::GetVecGramScore(lhs);
-	rScore = WordSeg::GetVecGramScore(rhs);
-	
-	return lScore < rScore;
+	return WordSeg::GetVecGramScore(lhs) < WordSeg::GetVecGramScore(rhs);
 }
 
 #endif
