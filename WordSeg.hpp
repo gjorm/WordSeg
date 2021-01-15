@@ -394,15 +394,11 @@ public:
 			
 			//if the gram is found, find its raw counts and calculate its score
 			if (gi != uniGrams.end()) {
-				score = gi->second.GetScore() / numCounts;
-				//score = (gi->second.GetScore() * pow((double)in.size(), 2)) / (numCounts / ((double)in.size() * 20));
+				score = (gi->second.GetScore() * (double)in.size()) / numCounts;
 				result = log10(score);
 			}
 			else {//gram is not found
 				result = -3 * (double)in.size();
-				//score = 1 / (pow((double)in.size(), 10) * numCounts);
-				//score = 1 / (pow((double)in.size(), 2) / numCounts);//1 / (numCounts * pow(1.8,(double)in.size())); //
-				//result = log10(score);
 			}
 		}
 
