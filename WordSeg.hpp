@@ -40,6 +40,7 @@
 #include <array>
 #include <memory>
 #include <cctype>
+#include <cfloat>
 
 using namespace std;
 
@@ -94,7 +95,7 @@ private:
 	unordered_map<string, WSGram> uniGrams;
 	unordered_map<string, WSGram> biGrams;
 	unordered_map<string, vector<WSGram>> segMemo;//a hash map to memoize Segment()
-	const double numCounts = 1024908267229;
+	double numCounts = 0;// 494290;
 	double gMin = 10000000000.0, gMax = 0.0;
 	double bgMin = 10000000000.0, bgMax = 0.0;
 	const int maxSegLength = 24;
@@ -242,6 +243,9 @@ public:
 						alt = true;
 						get = "";
 						
+						//update numCounts
+						numCounts += (double)foo.GetScore();
+						
 						//make the insert after the score is found
 						//attempt the insert
 						res = uniGrams.insert(make_pair(foo.GetGram(), foo));
@@ -298,6 +302,9 @@ public:
 						alt = 0;
 						get = "";
 						
+						//update numCounts
+						numCounts += (double)foo.GetScore();
+						
 						//make the insert after the score is found
 						//attempt the insert
 						res = biGrams.insert(make_pair(foo.GetGram(), foo));
@@ -321,7 +328,7 @@ public:
 		inFile.close();
 		
 		
-		//Set a arbitarily large bucket size for the Memo Hash Table
+		//Set an arbitarily large bucket size for the Memo Hash Table
 		segMemo.rehash(segMemoSize);
 
 	}
@@ -359,7 +366,8 @@ public:
 		//segMemo will maintain return values that benefit other runs of Segment, even with different input
 		segMemo.clear();
 		
-		vector<WSGram> result = pSegment(in);
+		//capitalize the input into pSegment
+		vector<WSGram> result = pSegment(StringUpper(in));
 		
 		return result;
 	}
@@ -384,13 +392,17 @@ public:
 		else {
 			gi = uniGrams.find(in);
 			
+			//if the gram is found, find its raw counts and calculate its score
 			if (gi != uniGrams.end()) {
-				score = (gi->second.GetScore() * pow((double)in.size(), 2)) / (numCounts / ((double)in.size() * 20));
+				score = gi->second.GetScore() / numCounts;
+				//score = (gi->second.GetScore() * pow((double)in.size(), 2)) / (numCounts / ((double)in.size() * 20));
 				result = log10(score);
 			}
-			else {
-				score = 1 / (numCounts * (pow((double)in.size(), 2)));
-				result = log10(score);
+			else {//gram is not found
+				result = -3 * (double)in.size();
+				//score = 1 / (pow((double)in.size(), 10) * numCounts);
+				//score = 1 / (pow((double)in.size(), 2) / numCounts);//1 / (numCounts * pow(1.8,(double)in.size())); //
+				//result = log10(score);
 			}
 		}
 
@@ -478,8 +490,9 @@ public:
 				result = log10((gi->second.GetScore() * test.size()) / numCounts) / (GetGramScore(left) * 5);
 			}
 			else {
-				//on failure to find anything in the bigrams, fall back to unigrams for the right string
-				result = GetGramScore(right);
+				//on failure to find anything in the bigrams, fall back to unigrams for the input strings
+				result = GetGramScore(left);
+				result += GetGramScore(right);
 			}
 		}
 
