@@ -51,6 +51,15 @@ int main(int argc, char **argv)
 	cout << "Single Gram Proba Test for BARE:  " << model.GetGramScore("BARE") << endl;
 	cout << "Total: " << gramCount << endl << endl;
 	
+	test = "OOZYSMELLNORYETADRYBARE";
+	ex = model.Segment(test);
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
 	cout << "Single Gram Proba Test for IIOASAINTTICFTDOCTSATN: " << model.GetGramScore("IIOASAINTTICFTDOCTSATN") << endl << endl;
 
 	
@@ -77,7 +86,18 @@ int main(int argc, char **argv)
 	//cout << endl;
 	
 	
-	test = WordSeg::StringUpper("AFTERanunequivocalexperienceoftheinefficacyofthesubsistingfederalgovernmentyouarecalledupontodeliberateonanewConstitutionfortheUnitedStatesofAmericaThesubjectspeaksitsownimportancecomprehendinginitsconsequencesnothinglessthantheexistenceoftheUNIONthesafetyandwelfareofthepartsofwhichitiscomposedthefateofanempireinmanyrespectsthemostinterestingintheworldIthasbeenfrequentlyremarkedthatitseemstohavebeenreservedtothepeopleofthiscountrybytheirconductandexampletodecidetheimportantquestionwhethersocietiesofmenarereallycapableornotofestablishinggoodgovernmentfromreflectionandchoiceorwhethertheyareforeverdestinedtodependfortheirpoliticalconstitutionsonaccidentandforceIftherebeanytruthintheremarkthecrisisatwhichwearearrivedmaywithproprietyberegardedastheerainwhichthatdecisionistobemadeandawrongelectionofthepartweshallactmayinthisviewdeservetobeconsideredasthegeneralmisfortuneofmankind");
+	test = WordSeg::StringUpper("AFTERanunequivocalexperienceoftheinefficacyofthesubsistingfederalgovernmentyouarecalledupontodeliberateonanewConstitutionfortheUnitedStatesofAmericaThesubjectspeaksitsownimportancecomprehendinginitsconsequencesnothinglessthantheexistenceoftheUNIONthesafetyandwelfareofthepartsofwhichitiscomposedthefateofanempireinmanyrespectsthemostinterestingintheworldIthasbeenfrequentlyremarkedthatitseemstohavebeenreservedtothepeopleofthiscountrybytheirconductandexampletodecidetheimportantquestionwhethersocietiesofmenarereallycap");
+	ex = model.Segment(test);
+	
+	for(int i = 0; i < (int)ex.size(); i++) {
+		cout << ex[i].gram << " ";
+	}
+	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	
+	test = WordSeg::StringUpper("toatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoatintoa");
 	ex = model.Segment(test);
 	
 	for(int i = 0; i < (int)ex.size(); i++) {
@@ -96,14 +116,6 @@ int main(int argc, char **argv)
 	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
 	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
-	test = "OOZYSMELLNORYETADRYBARE";
-	ex = model.Segment(test);
-	
-	for(int i = 0; i < (int)ex.size(); i++) {
-		cout << ex[i].gram << " ";
-	}
-	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
-	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
 	test = WordSeg::StringUpper("inaholeinthegroundtherelivedahobbitnotanastydirtywetholefilledwiththeendsofwormsandanoozysmellnoryetadrybaresandyholewithnothinginittositdownonortoeatitwasahobbitholeandthatmeanscomfort");
@@ -146,6 +158,10 @@ int main(int argc, char **argv)
 	
 	cout << "  uniGrams Score: " << exPair.first << endl;
 	
+	double biScore = model.GetVecBiGramScore(ex);
+	
+	cout << "  biGrams Score: " << biScore << endl << endl;
+	
 	test = WordSeg::StringUpper("thissentenceisbackwards");
 	ex = model.Segment(test);
 	exPair = model.GetVecPair(ex);
@@ -154,15 +170,31 @@ int main(int argc, char **argv)
 	
 	cout << "  uniGrams Score: " << exPair.first << endl;
 	
-	double biScore = model.GetVecBiGramScore(ex);
+	biScore = model.GetVecBiGramScore(ex);
 	
 	cout << "  biGrams Score: " << biScore << endl << endl;
 	
 	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
-	time_t before;
-	time(&before);
+	
+	test = WordSeg::StringUpper("ihavedepositedinthecountyofBedfordaboutfourmilesfromBufordsinanexcavationorvaultsixfeetbelowthesurfaceofthegroundthefollowingarticlesbelongingjointlytothepartieswhosenamesaregiveninnumberthreeherewiththefirstdepositconsistedoftenhundredandfourteenpoundsofgoldandthirtyeighthundredandtwelvepoundsofsilverdepositedNoveighteennineteenThesecondwasmadeDeceighteentwentyoneandconsistedofnineteenhundredandsevenpoundsofgoldandtwelvehundredandeightyeightofsilver;alsojewelsobtainedinStLouisinexchangetosavetransportationandvaluedatthirteenthousanddollarstheaboveissecurelypackedinironpotswithironcoversThevaultisroughlylinedwithstoneandthevesselsrestonsolidstoneandarecoveredwithothersPapernumberonedescribestheexactlocalityofthevaultsothatnodifficultywillbehadinfindingit");
+	ex = model.Segment(test);
+	exPair = model.GetVecPair(ex);
+	
+	cout << exPair.second << endl;
+	
+	cout << "  uniGrams Score: " << exPair.first << endl;
+	
+	biScore = model.GetVecBiGramScore(ex);
+	
+	cout << "  biGrams Score: " << biScore << endl << endl;
+	
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	
+	
+	
+	clock_t before = clock();
 	
 	test = "IIOASAINTTICFTDOCTSATNTOIICBOBSRAATAOOFSWOMSTSJTMDAASUIFIIGOSSWKSAIEABBDHSGSBTTUTIAOOEWRCYTSHCCAOSIDINTSISTCTITTTMCGAWTTABIENIBSBSEHOENTOSTTAOOTTITOATUOIICMWOIACSACFIICTCOATSEIBISDTSSVNOEUWFHMOTSTBIITSINWTIONAIOIACCTOASINNISIOOFAMPTETSTDSIOATITOSIASMSAOAPTICTHOONMTTOTNSTOMMANAWIDISONOTATOBCDTISIYFAOSDETBATITTSISKTOWHSECATOSAHDITHCFNOOTSSFOTIOETFHITTIASPTTINSTOOTOONWIIPDSARYIDPDISOTINTIAFEADIPCRTMWDSACAOIETSSOISTIITNHAESADATSCITFMTTSASTTSTUBSOANIHSICBLTWFTTOPSACTSHTOOHDWOSBTIOCSDIFWWONTSMONTBWIITOUIIIITSIIWOCWTIOIIA";
 	ex = model.Segment(test);
@@ -171,12 +203,12 @@ int main(int argc, char **argv)
 		cout << ex[i].gram << " ";
 	}
 	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << "BiGram Score: " << model.GetVecBiGramScore(ex) << endl << endl;
 	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
-	time_t after;
-	time(&after);
+	time_t after = clock();
 	
-	cout << "Time Taken on the last test: " << after - before << " seconds." << endl << endl;
+	cout << "Time Taken on the last test: " << (after - before) / (double) (CLOCKS_PER_SEC / 1000) << " ms." << endl << endl;
 	
 	
 	return 0;
