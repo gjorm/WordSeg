@@ -1,5 +1,5 @@
 # WordSeg
-English language word segmentation on strings with no spaces in a Header Only Library (WordSeg.hpp).
+Word Segmentation on strings with no spaces in a Header Only Library (WordSeg.hpp).
 
 Based on Chapter 14 of Beautiful Data and using the word unigram frequencies from Peter Norvig: https://norvig.com/ngrams/
 
