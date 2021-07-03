@@ -82,7 +82,7 @@ public:
 	}
 };
 
-//overload for comparing two grams
+//Operator Overloads
 bool operator < (const WSGram &lhs, const WSGram &rhs) {
 	return lhs.score < rhs.score;
 }
@@ -94,11 +94,12 @@ class WordSeg
 private:
 	unordered_map<string, WSGram> uniGrams;
 	unordered_map<string, WSGram> biGrams;
-	unordered_map<string, vector<WSGram>> segMemo;//a hash map to memoize Segment()
+	unordered_map<string, pair<double, vector<WSGram>>> segMemo;//a hash map to memoize Segment()
 	double numCounts = 0;// 494290;
+	double numCounts2 = 0;
 	double gMin = 10000000000.0, gMax = 0.0;
 	double bgMin = 10000000000.0, bgMax = 0.0;
-	const int maxSegLength = 24;
+	const int maxSegLength = 18;//Norvig uses 24 characters for this, but I've tuned it down to 18 for speed
 	const int segMemoSize = 10000;//arbitrary initial size for segMemo
 	int numIters = 0;
 	
@@ -141,18 +142,20 @@ private:
 	
 	//Private inner recursive method of Segment
 	//Segment
-	vector<WSGram> pSegment(const string &in) {
+	pair<double, vector<WSGram>> pSegment(const string &in) {
 		WSGram wsLeft, wsRight;
-		vector<WSGram> cands;
-		vector<WSGram> result;
-		vector<vector<WSGram>> candHeap;
-		unordered_map<string, vector<WSGram>>::iterator mi;
+		//using pair<double, vector<WSGGram>> for all storage needs, so that scoring happens only once. No need to reiterate over the vector of grams over and over
+		pair<double, vector<WSGram>> cands;
+		pair<double, vector<WSGram>> result;
+		vector<pair<double, vector<WSGram>>> candHeap;
+		unordered_map<string, pair<double, vector<WSGram>>>::iterator mi;
 		
 		if(in == "") {
-			result.push_back(WSGram("", GetGramScore("")));
+			result.second.push_back(WSGram("", GetGramScore("")));
+			result.first = GetGramScore("");
 			return result;
 		}
-		else {//"memoize" section; dont do the work if the input already exists in the seg memo hash table
+		else {//"memoize" section; dont do the work if the input already exists in the segMemo hash table
 			mi = segMemo.find(in);
 			if(mi != segMemo.end()) {
 				result = mi->second;
@@ -165,42 +168,44 @@ private:
 					wsRight.gram = in.substr(i, string::npos);
 					
 					//recursively call pSegment on the right string
-					if(wsRight.gram != "") cands = pSegment(wsRight.gram);
+					cands = pSegment(wsRight.gram);
 					
 					//Score
 					//only need to score the left gram; the lower recursive depths will return this and higher depths will accept as the higher prob segment of right
-					//I attempted to improve this by keeping track of the score of the entire vector, ensuring a single calculation, however this still resulted in innefficiency
 					wsLeft.score = GetGramScore(wsLeft.gram);
 					
 					//store into result (result is being used as a worker, not a return val yet)
-					result.push_back(wsLeft);
-					if(cands.size() > 0) result.insert(result.end(), cands.begin(), cands.end());
+					result.second.push_back(wsLeft);
+					//store right side cands
+					if(cands.second[cands.second.size() - 1].GetGram() != "") result.second.insert(result.second.end(), cands.second.begin(), cands.second.end());
+					//grab scores of the left Gram plus the right side vector of candidates
+					result.first = wsLeft.score + cands.first;
 					
 					//push onto the candHeap vector...
-					if(!result.empty()) candHeap.push_back(result);
+					if(!result.second.empty()) candHeap.push_back(result);
 					
 					//clear out these vectors for next iteration
-					result.clear();
-					cands.clear();
+					result.second.clear();
+					result.first = 0.0;
+					cands.second.clear();
+					cands.first = 0.0;
 					
 					//count the number of iterations it takes to compute an input
 					numIters++;
 				}
 				
 				//grab the highest valued WSGram attempt from the candHeap vector
-				//Iterating through the vector afterwards is a touch faster than a priority_queue during the above for loop
+				//Iterating through the vector afterwards is a touch faster than a priority_queue during the above for loop, for the string size of a few sentences anyways
 				result = candHeap[0];
-				double s, t;
 				
-				s = GetVecGramScore(result);
+				
 				for(int i = 1; i < (int)candHeap.size(); i++) {
-					t = GetVecGramScore(candHeap[i]);
 					
-					if(t > s) {
+					if(result.first < candHeap[i].first) {
 						result = candHeap[i];
-						s = t;
 					}
 				}
+				
 				
 				
 				//insert the vector into the segMemo hash table, as it was not found at the beginning of the method
@@ -303,7 +308,7 @@ public:
 						get = "";
 						
 						//update numCounts
-						numCounts += (double)foo.GetScore();
+						numCounts2 += (double)foo.GetScore();
 						
 						//make the insert after the score is found
 						//attempt the insert
@@ -340,17 +345,17 @@ public:
 	}
 	
 	void PrintSegMemo() {
-		unordered_map<string, vector<WSGram>>::iterator gi;
-		vector<WSGram> foo;
+		unordered_map<string, pair<double, vector<WSGram>>>::iterator gi;
+		vector<WSGram> gram;
 		string input;
 		
 		if(segMemo.size() > 0) {
 			for(gi = segMemo.begin(); gi != segMemo.end(); ++gi) {
 				input = gi->first;
 				cout << "    Input: " << input << endl;
-				foo = gi->second;
-				for(int i = 0; i < (int)foo.size(); i++) {
-					cout << foo[i].gram << " " << foo[i].score << endl;
+				gram = gi->second.second;
+				for(int i = 0; i < (int)gram.size(); i++) {
+					cout << gram[i].gram << " " << gram[i].score << endl;
 				}
 				cout << endl;
 			}
@@ -360,16 +365,39 @@ public:
 
 	//Public Accessible Segment function for managing the segMemo hash table
 	vector<WSGram> Segment(const string &in) {
-		numIters = 0;
-		
+
+		pair<double, vector<WSGram>> result = pSegment(in);
+
 		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
 		//segMemo will maintain return values that benefit other runs of Segment, even with different input
 		segMemo.clear();
 		
-		//capitalize the input into pSegment
-		vector<WSGram> result = pSegment(StringUpper(in));
+		return result.second;
+	}
+
+	//Public Accessible Segment function for managing the segMemo hash table, but returns the score in a pair with the vector results
+	pair<double, vector<WSGram>> SegmentRetScore(const string &in) {
+
+		pair<double, vector<WSGram>> result = pSegment(in);
+
+		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
+		//segMemo will maintain return values that benefit other runs of Segment, even with different input
+		//segMemo.clear();
 		
 		return result;
+	}
+
+	//Public Accessible Segment function for managing the segMemo hash table, but does not require all caps input
+	vector<WSGram> SegmentAnyCase(const string &in) {
+		
+		//capitalize the input into pSegment
+		pair<double, vector<WSGram>> result = pSegment(StringUpper(in));
+
+		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
+		//segMemo will maintain return values that benefit other runs of Segment, even with different input
+		segMemo.clear();
+		
+		return result.second;
 	}
 	
 	void ClearSegMemo() {
@@ -384,7 +412,6 @@ public:
 	double GetGramScore(const string &in) {
 		unordered_map<string, WSGram>::iterator gi;
 		double result = 0.0;
-		double score;
 		
 		if(in.size() <= 0 || in == "") {
 			result = GetEmptyGramScore();
@@ -394,11 +421,10 @@ public:
 			
 			//if the gram is found, find its raw counts and calculate its score
 			if (gi != uniGrams.end()) {
-				score = (gi->second.GetScore() * (double)in.size()) / numCounts;
-				result = log10(score);
+				result = log10(gi->second.GetScore() / numCounts);// * (double)in.size();
 			}
 			else {//gram is not found
-				result = -3 * (double)in.size();
+				result = log10((1 / (numCounts * 2))) * (double)in.size();
 			}
 		}
 
@@ -483,7 +509,7 @@ public:
 			gi = biGrams.find(test);
 			
 			if (gi != uniGrams.end()) {
-				result = log10((gi->second.GetScore() * test.size()) / numCounts) / (GetGramScore(left) * 5);
+				result = log10((gi->second.GetScore() * test.size()) / numCounts2) / GetGramScore(left);
 			}
 			else {
 				//on failure to find anything in the bigrams, fall back to unigrams for the input strings
@@ -510,6 +536,18 @@ public:
 				vec[i].score = GetBiGramScore(vec[i - 1].gram, vec[i].gram);
 				result += vec[i].score;
 			}
+		}
+		
+		return result;
+	}
+
+	//retrieve a vector of grams consolidated into a pair with the sum of its bigram scores and a string of its concatenated grams
+	pair<double, string> GetVecBiGramPair(vector<WSGram> &vG) {
+		pair<double, string> result;
+		result.first = GetVecBiGramScore(vG);
+		
+		for(int i = 0; i < (int)vG.size(); i++) {
+			result.second += vG[i].gram + " ";
 		}
 		
 		return result;
