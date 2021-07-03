@@ -382,7 +382,7 @@ public:
 
 		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
 		//segMemo will maintain return values that benefit other runs of Segment, even with different input
-		//segMemo.clear();
+		segMemo.clear();
 		
 		return result;
 	}
