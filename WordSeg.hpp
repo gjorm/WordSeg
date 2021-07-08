@@ -99,7 +99,7 @@ private:
 	double numCounts2 = 0;
 	double gMin = 10000000000.0, gMax = 0.0;
 	double bgMin = 10000000000.0, bgMax = 0.0;
-	const int maxSegLength = 18;//Norvig uses 24 characters for this, but I've tuned it down to 18 for speed
+	const int maxSegLength = 18;//Norvig uses 20 characters for this, but I've tuned it down to 18 for speed
 	const int segMemoSize = 10000;//arbitrary initial size for segMemo
 	int numIters = 0;
 	
