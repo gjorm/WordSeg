@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 	vector<WSGram> ex;
 	string test;
 	double gramCount = 0;
+	double biScore;
 	
 	gramCount += model.GetGramScore("OOZY");
 	cout << "Single Gram Proba Test for OOZY:  " << gramCount << endl;
@@ -103,7 +104,9 @@ int main(int argc, char **argv)
 	for(int i = 0; i < (int)ex.size(); i++) {
 		cout << ex[i].gram << " ";
 	}
-	cout << endl << "Score: " << model.GetVecGramScore(ex) << endl;
+	cout << endl << " Score: " << model.GetVecGramScore(ex) << endl;
+	biScore = model.GetVecBiGramScore(ex);
+	cout << "  biGrams Score: " << biScore << endl << endl;
 	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
 	
 	
@@ -158,7 +161,7 @@ int main(int argc, char **argv)
 	
 	cout << "  uniGrams Score: " << exPair.first << endl;
 	
-	double biScore = model.GetVecBiGramScore(ex);
+	biScore = model.GetVecBiGramScore(ex);
 	
 	cout << "  biGrams Score: " << biScore << endl << endl;
 	
@@ -174,11 +177,28 @@ int main(int argc, char **argv)
 	
 	cout << "  biGrams Score: " << biScore << endl << endl;
 	
-	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << endl << endl;
+	cout << "Iterations: " << model.GetNumIters() << " for size " << test.size() << ". segMemo size: " << model.GetMemoSize() << " Number of Words found: " << ex.size() << endl << endl;
+
+
+	gramCount = model.GetGramScore("IN");
+	cout << "Single Gram Proba Test for IN:  " << model.GetGramScore("IN") << endl;
+	gramCount += model.GetGramScore("AN");
+	cout << "Single Gram Proba Test for AN:  " << model.GetGramScore("AN") << endl;
+
+	cout << "Single Gram Proba Test for SINAN:  " << model.GetGramScore("SINAN") << endl;
+	cout << "Total: " << gramCount << endl << endl;
+
+	gramCount = model.GetGramScore("REST");
+	cout << "Single Gram Proba Test for REST:  " << model.GetGramScore("REST") << endl;
+	gramCount += model.GetGramScore("ON");
+	cout << "Single Gram Proba Test for ON:  " << model.GetGramScore("ON") << endl;
+	
+	cout << "Single Gram Proba Test for RESTON:  " << model.GetGramScore("RESTON") << endl;
+	cout << "Total: " << gramCount << endl << endl;
 	
 	
 	
-	test = WordSeg::StringUpper("ihavedepositedinthecountyofBedfordaboutfourmilesfromBufordsinanexcavationorvaultsixfeetbelowthesurfaceofthegroundthefollowingarticlesbelongingjointlytothepartieswhosenamesaregiveninnumberthreeherewiththefirstdepositconsistedoftenhundredandfourteenpoundsofgoldandthirtyeighthundredandtwelvepoundsofsilverdepositedNoveighteennineteenThesecondwasmadeDeceighteentwentyoneandconsistedofnineteenhundredandsevenpoundsofgoldandtwelvehundredandeightyeightofsilver;alsojewelsobtainedinStLouisinexchangetosavetransportationandvaluedatthirteenthousanddollarstheaboveissecurelypackedinironpotswithironcoversThevaultisroughlylinedwithstoneandthevesselsrestonsolidstoneandarecoveredwithothersPapernumberonedescribestheexactlocalityofthevaultsothatnodifficultywillbehadinfindingit");
+	test = WordSeg::StringUpper("ihavedepositedinthecountyofBedfordaboutfourmilesfromBufordsinanexcavationorvaultsixfeetbelowthesurfaceofthegroundthefollowingarticlesbelongingjointlytothepartieswhosenamesaregiveninnumberthreeherewiththefirstdepositconsistedoftenhundredandfourteenpoundsofgoldandthirtyeighthundredandtwelvepoundsofsilverdepositedNoveighteennineteenThesecondwasmadeDeceighteentwentyoneandconsistedofnineteenhundredandsevenpoundsofgoldandtwelvehundredandeightyeightofsilveralsojewelsobtainedinStLouisinexchangetosavetransportationandvaluedatthirteenthousanddollarstheaboveissecurelypackedinironpotswithironcoversThevaultisroughlylinedwithstoneandthevesselsrestonsolidstoneandarecoveredwithothersPapernumberonedescribestheexactlocalityofthevaultsothatnodifficultywillbehadinfindingit");
 	ex = model.Segment(test);
 	exPair = model.GetVecPair(ex);
 	
@@ -208,7 +228,7 @@ int main(int argc, char **argv)
 	
 	time_t after = clock();
 	
-	cout << "Time Taken on the last test: " << (after - before) / (double) (CLOCKS_PER_SEC / 1000) << " ms." << endl << endl;
+	cout << "Time Taken on the last test: " << (after - before) / (double)(CLOCKS_PER_SEC / 1000) << " ms." << endl << endl;
 	
 	
 	return 0;

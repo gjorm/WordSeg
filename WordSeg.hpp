@@ -99,7 +99,7 @@ private:
 	double numCounts2 = 0;
 	double gMin = 10000000000.0, gMax = 0.0;
 	double bgMin = 10000000000.0, bgMax = 0.0;
-	const int maxSegLength = 18;//Norvig uses 20 characters for this, but I've tuned it down to 18 for speed
+	const size_t maxSegLength = 18;//Norvig uses 20 characters for this, but I've tuned it down to 18 for speed
 	const int segMemoSize = 10000;//arbitrary initial size for segMemo
 	int numIters = 0;
 	
@@ -155,14 +155,15 @@ private:
 			result.first = GetGramScore("");
 			return result;
 		}
-		else {//"memoize" section; dont do the work if the input already exists in the segMemo hash table
+		else {
+			//"memoize" section; dont do the work if the input already exists in the segMemo hash table
 			mi = segMemo.find(in);
 			if(mi != segMemo.end()) {
 				result = mi->second;
 				return result;
 			}
 			else {
-				for(int i = 1; (i <= (int)in.size() && i <= maxSegLength); i++) {
+				for(size_t i = 1; (i <= in.size() && i <= maxSegLength); i++) {
 					//split the text
 					wsLeft.gram = in.substr(0, i);
 					wsRight.gram = in.substr(i, string::npos);
@@ -199,8 +200,8 @@ private:
 				result = candHeap[0];
 				
 				
-				for(int i = 1; i < (int)candHeap.size(); i++) {
-					
+				for(size_t i = 1; i < candHeap.size(); i++) {
+					//if the next candidate scores higher, store it in result
 					if(result.first < candHeap[i].first) {
 						result = candHeap[i];
 					}
@@ -365,12 +366,11 @@ public:
 
 	//Public Accessible Segment function for managing the segMemo hash table
 	vector<WSGram> Segment(const string &in) {
-
-		pair<double, vector<WSGram>> result = pSegment(in);
-
-		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
+		//may need to comment out the clear() call during a HillClimb() then call ClearSegMemo() after a more ideal period as
 		//segMemo will maintain return values that benefit other runs of Segment, even with different input
 		segMemo.clear();
+
+		pair<double, vector<WSGram>> result = pSegment(in);
 		
 		return result.second;
 	}
@@ -389,13 +389,12 @@ public:
 
 	//Public Accessible Segment function for managing the segMemo hash table, but does not require all caps input
 	vector<WSGram> SegmentAnyCase(const string &in) {
+		//may need to comment out the .clear() during a HillClimb() then call ClearSegMemo() after a more ideal period as
+		//segMemo will maintain return values that benefit other runs of Segment, even with different input
+		segMemo.clear();
 		
 		//capitalize the input into pSegment
 		pair<double, vector<WSGram>> result = pSegment(StringUpper(in));
-
-		//may need to comment this out during a HillClimb() then call ClearSegMemo() after a more ideal period as
-		//segMemo will maintain return values that benefit other runs of Segment, even with different input
-		segMemo.clear();
 		
 		return result.second;
 	}
@@ -421,10 +420,10 @@ public:
 			
 			//if the gram is found, find its raw counts and calculate its score
 			if (gi != uniGrams.end()) {
-				result = log10(gi->second.GetScore() / numCounts);// * (double)in.size();
+				result = log10(gi->second.GetScore() / numCounts);
 			}
 			else {//gram is not found
-				result = log10((1 / (numCounts * 2))) * (double)in.size();
+				result = log10(5 / (double)numCounts) * (double)in.size();
 			}
 		}
 
@@ -503,7 +502,7 @@ public:
 		string test = left + " " + right;
 		
 		if(test == "") {
-			result = 0;
+			result = GetEmptyGramScore();
 		}
 		else {
 			gi = biGrams.find(test);
