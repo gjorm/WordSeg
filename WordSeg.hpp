@@ -21,6 +21,14 @@
  * 
  */
 
+
+/*
+
+Note: this code was not designed by me. It is based on the Python code written by 
+Peter Norvig from Chapter 14 of "Beautiful Data" and I have adapted it to C++
+
+*/
+
 #ifndef WORDSEG_HPP
 #define WORDSEG_HPP
 
