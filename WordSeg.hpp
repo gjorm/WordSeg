@@ -42,7 +42,6 @@ Peter Norvig from Chapter 14 of "Beautiful Data" and I have adapted it to C++
 #include <cstring>
 #include <utility>
 #include <vector>
-#include <queue>
 #include <cmath>
 #include <algorithm>
 #include <array>
@@ -110,6 +109,8 @@ private:
 	const size_t maxSegLength = 18;//Norvig uses 20 characters for this, but I've tuned it down to 18 for speed
 	const int segMemoSize = 10000;//arbitrary initial size for segMemo
 	int numIters = 0;
+
+	
 	
 	//check for good ascii and numeric characters
 	bool IsNumeric(char c) {
@@ -189,6 +190,7 @@ private:
 					if(cands.second[cands.second.size() - 1].GetGram() != "") result.second.insert(result.second.end(), cands.second.begin(), cands.second.end());
 					//grab scores of the left Gram plus the right side vector of candidates
 					result.first = wsLeft.score + cands.first;
+					//result.first = result.second[0].score + GetVecBiGramScore(vector<WSGram>(++result.second.begin(), result.second.end()));/slloooowwww and produces odd results
 					
 					//push onto the candHeap vector...
 					if(!result.second.empty()) candHeap.push_back(result);
@@ -214,9 +216,7 @@ private:
 						result = candHeap[i];
 					}
 				}
-				
-				
-				
+
 				//insert the vector into the segMemo hash table, as it was not found at the beginning of the method
 				segMemo.insert(make_pair(in, result));
 			}
@@ -425,29 +425,29 @@ public:
 		else {
 			gi = uniGrams.find(in);
 			
-			//if the gram is found, find its raw counts and calculate its score
+			//if the gram is found, find its raw counts and calulate its score
 			if (gi != uniGrams.end()) {
 				result = log10(gi->second.GetScore() / numCounts);
 			}
 			else {//gram is not found
-				result = log10(5 / (double)numCounts) * (double)in.size();
+				result = GetEmptyGramScore();
 			}
 		}
 
 		return result;
 	}
 	
-	static double GetEmptyGramScore() {
-		return 0;
+	double GetEmptyGramScore() {
+		return log10(1 / (double)numCounts) * (double)maxSegLength;
 	}
 	
-	//calculate a vector of grams' scores. The input vector is assumed to have been segmented and each Gram contains its pre calculated score from Segment()
-	static double GetVecGramScore(const vector<WSGram> &vG) {
-		double total = GetEmptyGramScore();
+	// Sum a vector of grams' scores. The input vector is assumed to have been segmented and each Gram contains its pre calculated score from Segment()
+	double GetVecGramScore(const vector<WSGram> &vG) {
+		double total = 0;
 		
 		if(vG.size() > 0) {
 			for(int i = 0; i < (int)vG.size(); i++) {
-				total += vG[i].score;
+				total += vG[i].score;//do not recalculate for efficiency
 			}
 		}
 		
@@ -508,20 +508,15 @@ public:
 		//bigrams are space separated unigrams
 		string test = left + " " + right;
 		
-		if(test == "") {
-			result = GetEmptyGramScore();
+		gi = biGrams.find(test);
+
+		if (gi != uniGrams.end()) {
+			result = log10(gi->second.GetScore() / (numCounts2 / 100000));// manual manipulation of numCounts2 to get BiGramScores better than UniGram scores given their distribution differences
 		}
 		else {
-			gi = biGrams.find(test);
-			
-			if (gi != uniGrams.end()) {
-				result = log10((gi->second.GetScore() * test.size()) / numCounts2) / GetGramScore(left);
-			}
-			else {
-				//on failure to find anything in the bigrams, fall back to unigrams for the input strings
-				result = GetGramScore(left);
-				result += GetGramScore(right);
-			}
+			//on failure to find anything in the bigrams, fall back to unigrams for the input strings
+			result = GetGramScore(left);
+			result += GetGramScore(right);
 		}
 
 		return result;
@@ -529,19 +524,21 @@ public:
 	
 	//score a vector of grams using biGram data
 	double GetVecBiGramScore(vector<WSGram> &vec) {
-		double result;
-		
-		result = 0.0;
-		
+		double result = 0.0;
+
 		if(vec.size() > 0) {
-			vec[0].score = GetGramScore(vec[0].gram);
-			
+			vec[0].score = GetGramScore(vec[0].gram);//note how this alters the WSGram.score variable for each gram
 			result = vec[0].score;
 			
-			for(int i = 1; i < (int)vec.size(); i++) {
-				vec[i].score = GetBiGramScore(vec[i - 1].gram, vec[i].gram);
-				result += vec[i].score;
+			if(vec.size() > 1) {
+				for(int i = 1; i < (int)vec.size(); i++) {
+					vec[i].score = GetBiGramScore(vec[i - 1].gram, vec[i].gram);
+					result += vec[i].score;
+				}
 			}
+		}
+		else {
+			return GetEmptyGramScore();
 		}
 		
 		return result;
@@ -586,9 +583,6 @@ public:
 	}
 };
 
-//operator overload for the priority queue of a vector of grams
-bool operator < (const vector<WSGram> &lhs, const vector<WSGram> &rhs) {
-	return WordSeg::GetVecGramScore(lhs) < WordSeg::GetVecGramScore(rhs);
-}
+
 
 #endif
