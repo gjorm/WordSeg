@@ -384,7 +384,7 @@ public:
 	}
 
 	//Public Accessible Segment function for managing the segMemo hash table, but returns the score in a pair with the vector results
-	pair<double, vector<WSGram>> SegmentRetScore(const string &in) {
+	pair<double, vector<WSGram>> SegmentWithScore(const string &in) {
 		//may need to comment out the clear() call during a HillClimb() then call ClearSegMemo() after a more ideal period as
 		//segMemo will maintain return values that benefit other runs of Segment, even with different input
 		segMemo.clear();
