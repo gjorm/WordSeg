@@ -37,6 +37,7 @@ Peter Norvig from Chapter 14 of "Beautiful Data" and I have adapted it to C++
 #include <stdexcept>
 #include <fstream>
 #include <unordered_map>
+#include <iterator>
 #include <string>
 #include <cstdlib>
 #include <cstring>
@@ -48,6 +49,8 @@ Peter Norvig from Chapter 14 of "Beautiful Data" and I have adapted it to C++
 #include <memory>
 #include <cctype>
 #include <cfloat>
+#include <random>
+#include <initializer_list>
 
 using namespace std;
 
@@ -102,7 +105,10 @@ private:
 	unordered_map<string, WSGram> uniGrams;
 	unordered_map<string, WSGram> biGrams;
 	unordered_map<string, pair<double, vector<WSGram>>> segMemo;//a hash map to memoize Segment()
-	double numCounts = 0;// 494290;
+	default_random_engine gen;
+	discrete_distribution<size_t> dist;
+	vector<unordered_map<string, WSGram>::iterator> iterHack;//i am a hack
+	double numCounts = 0;
 	double numCounts2 = 0;
 	double gMin = 10000000000.0, gMax = 0.0;
 	double bgMin = 10000000000.0, bgMax = 0.0;
@@ -345,6 +351,24 @@ public:
 		//Set an arbitarily large bucket size for the Memo Hash Table
 		segMemo.rehash(segMemoSize);
 
+
+
+		//set up random number generator for GrabRandomGram()
+		//discrete_distribution takes a vector of doubles for probabilities
+		vector<double> probs;
+
+		//assign probabilities from uniGrams to this vector
+		for(auto g = uniGrams.begin(); g != uniGrams.end(); ++g) {
+			//store the probability
+			probs.push_back(g->second.score / numCounts);
+			//store the iterator, yeet
+			iterHack.push_back(g);
+		}
+
+		//and init dist using this stupid method
+		discrete_distribution<size_t> blegh (probs.begin(), probs.end());
+		dist.param(blegh.param());
+
 	}
 	
 	~WordSeg() {
@@ -565,6 +589,15 @@ public:
 		}
 		
 		return result;
+	}
+
+
+	WSGram GetRandomGram(long long seed) {
+		//seed the engine
+		gen.seed(seed);
+
+		//use randomly generated number in our hacky vector of iterators
+		return iterHack[dist(gen)]->second;
 	}
 	
 	//regular accessors
