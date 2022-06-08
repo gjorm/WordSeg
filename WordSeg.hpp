@@ -592,10 +592,13 @@ public:
 	}
 
 
-	WSGram GetRandomGram(long long seed) {
-		//seed the engine
+	//seed the random number generator
+	void SeedRandomEngine(long long seed) {
 		gen.seed(seed);
+	}
 
+	//generate a randomly selected word from the database
+	WSGram GetRandomGram() {
 		//use randomly generated number in our hacky vector of iterators
 		return iterHack[dist(gen)]->second;
 	}
